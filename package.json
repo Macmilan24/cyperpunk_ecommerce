@@ -7,7 +7,11 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "db:migrate": "node scripts/migrate-postgres.js"
+    "db:migrate": "node scripts/migrate-postgres.js",
+    "db:seed": "node scripts/seed-cyberpunk.js"
+  },
+  "dependencies": {
+    "db:seed": "node scripts/seed-cyberpunk.js"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.2.2",

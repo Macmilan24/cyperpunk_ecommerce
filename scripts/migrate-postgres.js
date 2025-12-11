@@ -130,6 +130,13 @@ async function migrate() {
         image TEXT,
         features JSONB, -- Bullet points
         specs JSONB,    -- Technical specs
+          creator TEXT,
+          collection TEXT,
+          chain TEXT,
+          "tokenId" TEXT,
+          attributes JSONB, -- NFT traits/metadata
+          files JSONB,      -- Digital asset files
+          gallery JSONB,    -- Additional images
         type TEXT NOT NULL DEFAULT 'physical', -- 'physical' or 'digital'
         "editionSize" INTEGER, -- For limited editions (e.g., 100)
         "createdAt" TIMESTAMP DEFAULT CURRENT_TIMESTAMP

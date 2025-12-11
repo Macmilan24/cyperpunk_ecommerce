@@ -23,8 +23,8 @@ export function ProductCard({ product, isInWishlist }: { product: Product; isInW
       <CardHeader className="p-0">
         <div className="relative w-full h-64 mb-4 border-b border-white/10 overflow-hidden group-hover:border-primary/50 transition-colors">
             <Link href={`/product/${product.id}`} className="block w-full h-full relative z-0">
-                {product.image ? (
-                     <Image src={product.image} alt={product.name} fill className="object-cover transition-transform duration-500 group-hover:scale-110 grayscale group-hover:grayscale-0" />
+                 {product.image ? (
+                   <Image src={product.image} alt={product.name} fill unoptimized className="object-cover transition-transform duration-500 group-hover:scale-110 grayscale group-hover:grayscale-0" />
                 ) : (
                     <div className="w-full h-full bg-gray-900 flex items-center justify-center text-gray-600 font-bold">NO IMAGE</div>
                 )}

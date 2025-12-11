@@ -49,10 +49,11 @@ export function Navbar() {
         
         <div className="hidden md:flex items-center gap-1 font-bold uppercase text-xs tracking-[0.2em]">
             {[
+              { name: "NFTs", href: "/category/digital-artifacts" },
               { name: "Digital", href: "/category/digital" },
               { name: "Physical", href: "/category/physical" },
-              { name: "Art", href: "/category/art" },
-              { name: "Collectibles", href: "/category/collect" }
+              { name: "Art Prints", href: "/category/art-prints" },
+              { name: "Collectibles", href: "/category/collectibles" }
             ].map((link) => (
               <Link key={link.name} href={link.href} className="group relative px-6 py-2 text-gray-400 hover:text-white transition-colors overflow-hidden">
                  <span className="relative z-10 group-hover:text-primary transition-colors duration-300">

@@ -68,7 +68,7 @@ export default async function ProductPage({ params }: { params: Promise<{ id: st
             <div className="absolute top-0 left-0 w-full h-1 bg-primary/50 shadow-[0_0_15px_rgba(204,255,0,0.5)] animate-scan z-30 opacity-50"></div>
 
             {product.image ? (
-                <Image src={product.image} alt={product.name} fill className="object-cover grayscale group-hover:grayscale-0 transition-all duration-700" />
+              <Image src={product.image} alt={product.name} fill unoptimized className="object-cover grayscale group-hover:grayscale-0 transition-all duration-700" />
             ) : (
                 <div className="w-full h-full bg-gray-900 flex items-center justify-center font-bold text-xl text-gray-600">NO IMAGE</div>
             )}

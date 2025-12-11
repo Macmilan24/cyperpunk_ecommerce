@@ -55,16 +55,17 @@ export async function GET(req: Request) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const wishlist = db
-      .prepare(
-        `
+    const result = await db.query(
+      `
       SELECT w.*, p.name as productName, p.price as productPrice, p.image as productImage, p.description as productDescription 
       FROM wishlist w 
       JOIN product p ON w.productId = p.id 
-      WHERE w.userId = ?
-    `
-      )
-      .all(session.user.id) as any[];
+      WHERE w.userId = $1
+    `,
+      [session.user.id]
+    );
+
+    const wishlist = result.rows;
 
     // Map to match previous structure if needed, or just return flat
     const formattedWishlist = wishlist.map((item) => ({

@@ -68,38 +68,40 @@ export default async function ProductsPage({ searchParams }: Readonly<{ searchPa
     <main className="min-h-screen bg-background text-white selection:bg-primary selection:text-black">
       <Navbar />
       
-      <div className="container mx-auto py-20 px-4">
-        <div className="flex flex-col md:flex-row justify-between items-end mb-12 border-b border-white/10 pb-6 gap-4">
-            <div>
-                <h1 className="text-6xl font-black uppercase tracking-tighter text-white mb-2">
+      <div className="container mx-auto py-16 px-4 sm:px-6 lg:px-8">
+        <div className="flex flex-col lg:flex-row justify-between items-start lg:items-end mb-10 border-b border-white/10 pb-6 gap-6">
+            <div className="space-y-2">
+                <h1 className="text-4xl sm:text-5xl lg:text-6xl font-black uppercase tracking-tighter text-white">
                     All <span className="text-primary">Inventory</span>
                 </h1>
-                <p className="font-mono text-gray-400">FULL_CATALOG_ACCESS // {total} ITEMS</p>
+                <p className="font-mono text-gray-400 text-sm sm:text-base">FULL_CATALOG_ACCESS // {total} ITEMS</p>
             </div>
             
-            <div className="flex gap-2 items-center">
-                <form className="flex gap-2" action="/products" method="get">
+            <div className="w-full lg:w-auto">
+                <form className="flex flex-wrap gap-3" action="/products" method="get">
                   <input type="hidden" name="page" value={String(page)} />
-                  <select name="sort" defaultValue={sort} className="px-3 py-2 border border-white/20 bg-transparent font-mono text-sm text-gray-200">
+                  <select name="sort" defaultValue={sort} className="min-w-[150px] px-3 py-2 border border-white/20 bg-transparent font-mono text-sm text-gray-200">
                     <option value="newest">Newest</option>
                     <option value="price_asc">Price ↑</option>
                     <option value="price_desc">Price ↓</option>
                     <option value="name_asc">Name A-Z</option>
                   </select>
-                  <select name="type" defaultValue={type ?? ""} className="px-3 py-2 border border-white/20 bg-transparent font-mono text-sm text-gray-200">
+                  <select name="type" defaultValue={type ?? ""} className="min-w-[150px] px-3 py-2 border border-white/20 bg-transparent font-mono text-sm text-gray-200">
                     <option value="">All Types</option>
                     <option value="digital">Digital</option>
                     <option value="physical">Physical</option>
                     <option value="artifact">Digital Artifact</option>
                   </select>
-                  <input name="min" type="number" step="0.01" placeholder="Min" defaultValue={minPrice ?? undefined} className="w-24 px-3 py-2 border border-white/20 bg-transparent font-mono text-sm text-gray-200" />
-                  <input name="max" type="number" step="0.01" placeholder="Max" defaultValue={maxPrice ?? undefined} className="w-24 px-3 py-2 border border-white/20 bg-transparent font-mono text-sm text-gray-200" />
+                  <div className="flex gap-2">
+                    <input name="min" type="number" step="0.01" placeholder="Min" defaultValue={minPrice ?? undefined} className="w-24 px-3 py-2 border border-white/20 bg-transparent font-mono text-sm text-gray-200" />
+                    <input name="max" type="number" step="0.01" placeholder="Max" defaultValue={maxPrice ?? undefined} className="w-24 px-3 py-2 border border-white/20 bg-transparent font-mono text-sm text-gray-200" />
+                  </div>
                   <button type="submit" className="px-4 py-2 border border-white/20 font-mono text-sm text-gray-200 uppercase">Apply</button>
                 </form>
             </div>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 sm:gap-8">
             {products.map((product) => (
                 <ProductCard 
                     key={product.id} 
@@ -135,7 +137,7 @@ function PaginationControls({ page, total, sort, type, minPrice, maxPrice, colle
   const nextDisabled = page >= totalPages;
 
   return (
-    <div className="mt-10 flex items-center justify-between font-mono text-sm text-gray-300">
+    <div className="mt-10 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 font-mono text-sm text-gray-300">
       <div>Page {page} of {totalPages}</div>
       <div className="flex gap-2">
         <a href={`/products?${prevParams.toString()}`} className={`px-4 py-2 border border-white/20 uppercase ${prevDisabled ? 'pointer-events-none opacity-40' : ''}`}>Prev</a>

@@ -75,7 +75,7 @@ export default async function CategoryPage({ params, searchParams }: Readonly<{ 
   return (
     <main className="min-h-screen bg-background text-white">
       <Navbar />
-      <div className="container mx-auto py-12 px-4">
+      <div className="container mx-auto py-12 px-4 sm:px-6 lg:px-8">
         {/* Breadcrumb */}
         <div className="mb-8 text-sm font-bold uppercase tracking-widest font-mono text-gray-500">
             <Link href="/" className="hover:text-primary transition-colors">Home</Link> 
@@ -84,7 +84,7 @@ export default async function CategoryPage({ params, searchParams }: Readonly<{ 
         </div>
 
         {/* Header Section */}
-        <div className="mb-12 border-b border-white/10 pb-6 relative overflow-hidden">
+        <div className="mb-10 border-b border-white/10 pb-6 relative overflow-hidden">
             <div className="absolute top-0 right-0 text-[100px] font-black text-white/5 pointer-events-none select-none leading-none -translate-y-1/4">
                 {category.name.substring(0, 3)}
             </div>
@@ -93,33 +93,35 @@ export default async function CategoryPage({ params, searchParams }: Readonly<{ 
                 <div className="font-mono text-xs text-primary tracking-widest uppercase">
                     Directory.Find("{category.slug}")
                 </div>
-                <h1 className="text-5xl md:text-7xl font-black uppercase tracking-tighter text-white flex items-center gap-4">
+                <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-black uppercase tracking-tighter text-white flex items-center gap-4">
                     <span className="w-2 h-16 bg-primary block"></span>
                     {category.name}
                 </h1>
                 <p className="text-gray-400 font-mono text-sm max-w-2xl mt-4 border-l border-white/20 pl-4">
                   {category.description}
                 </p>
-                <div className="mt-6">
-                  <form className="flex flex-wrap gap-2 items-end" action={`/category/${category.slug}`} method="get">
+                <div className="mt-6 w-full">
+                  <form className="flex flex-wrap gap-3 items-end" action={`/category/${category.slug}`} method="get">
                     <input type="hidden" name="page" value={String(page)} />
                     <label htmlFor="sort" className="font-mono text-xs text-gray-400">Sort</label>
-                    <select id="sort" name="sort" defaultValue={sort} className="px-3 py-2 border border-white/20 bg-transparent font-mono text-sm text-gray-200">
+                    <select id="sort" name="sort" defaultValue={sort} className="min-w-[150px] px-3 py-2 border border-white/20 bg-transparent font-mono text-sm text-gray-200">
                       <option value="newest">Newest</option>
                       <option value="price_asc">Price ↑</option>
                       <option value="price_desc">Price ↓</option>
                       <option value="name_asc">Name A-Z</option>
                     </select>
                     <label htmlFor="type" className="font-mono text-xs text-gray-400 ml-2">Type</label>
-                    <select id="type" name="type" defaultValue={type ?? ""} className="px-3 py-2 border border-white/20 bg-transparent font-mono text-sm text-gray-200">
+                    <select id="type" name="type" defaultValue={type ?? ""} className="min-w-[150px] px-3 py-2 border border-white/20 bg-transparent font-mono text-sm text-gray-200">
                       <option value="">All Types</option>
                       <option value="digital">Digital</option>
                       <option value="physical">Physical</option>
                       <option value="artifact">Digital Artifact</option>
                     </select>
                     <label htmlFor="min" className="font-mono text-xs text-gray-400 ml-2">Price</label>
-                    <input id="min" name="min" type="number" step="0.01" placeholder="Min" defaultValue={minPrice ?? undefined} className="w-24 px-3 py-2 border border-white/20 bg-transparent font-mono text-sm text-gray-200" />
-                    <input id="max" name="max" type="number" step="0.01" placeholder="Max" defaultValue={maxPrice ?? undefined} className="w-24 px-3 py-2 border border-white/20 bg-transparent font-mono text-sm text-gray-200" />
+                    <div className="flex gap-2">
+                      <input id="min" name="min" type="number" step="0.01" placeholder="Min" defaultValue={minPrice ?? undefined} className="w-24 px-3 py-2 border border-white/20 bg-transparent font-mono text-sm text-gray-200" />
+                      <input id="max" name="max" type="number" step="0.01" placeholder="Max" defaultValue={maxPrice ?? undefined} className="w-24 px-3 py-2 border border-white/20 bg-transparent font-mono text-sm text-gray-200" />
+                    </div>
                     <button type="submit" className="px-4 py-2 border border-white/20 font-mono text-sm text-gray-200 uppercase ml-2">Apply</button>
                   </form>
                 </div>
@@ -127,7 +129,7 @@ export default async function CategoryPage({ params, searchParams }: Readonly<{ 
         </div>
 
         {/* Product Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 sm:gap-8">
           {products.map((product) => (
             <ProductCard 
                 key={product.id} 
@@ -180,7 +182,7 @@ function CategoryPaginationControls({ basePath, page, total, sort, type, minPric
   const nextDisabled = page >= totalPages;
 
   return (
-    <div className="mt-10 flex items-center justify-between font-mono text-sm text-gray-300">
+    <div className="mt-10 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 font-mono text-sm text-gray-300">
       <div>Page {page} of {totalPages}</div>
       <div className="flex gap-2">
         <a href={`${basePath}?${prevParams.toString()}`} className={`px-4 py-2 border border-white/20 uppercase ${prevDisabled ? 'pointer-events-none opacity-40' : ''}`}>Prev</a>

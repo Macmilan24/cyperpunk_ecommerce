@@ -7,8 +7,16 @@ import Link from "next/link";
 import { getProductById, getProductVariants, getRelatedProducts } from "@/services/product.service";
 import { getCategoryById } from "@/services/category.service";
 
-export default async function ProductPage({ params }: { params: Promise<{ id: string }> }) {
-  const { id } = await params;
+type ParamsInput = Readonly<{ id: string }> | Promise<Readonly<{ id: string }>>;
+type ProductPageProps = Readonly<{ params: ParamsInput }>;
+
+function isPromise<T>(value: T | Promise<T>): value is Promise<T> {
+  return typeof (value as any)?.then === "function";
+}
+
+export default async function ProductPage({ params }: ProductPageProps) {
+  const resolvedParams = isPromise(params) ? await params : params;
+  const { id } = resolvedParams;
   const product = await getProductById(id);
 
   if (!product) {
@@ -24,7 +32,7 @@ export default async function ProductPage({ params }: { params: Promise<{ id: st
   return (
     <main className="min-h-screen bg-background text-white">
       <Navbar />
-      <div className="container mx-auto py-12 px-4">
+      <div className="container mx-auto py-12 px-4 sm:px-6 lg:px-8">
         {/* Breadcrumb */}
         <div className="mb-8 text-sm font-bold uppercase tracking-widest font-mono text-gray-500">
             <Link href="/" className="hover:text-primary transition-colors">Home</Link> 
@@ -38,17 +46,17 @@ export default async function ProductPage({ params }: { params: Promise<{ id: st
             <span className="text-white">{product.name}</span>
         </div>
 
-        <div className="grid md:grid-cols-2 gap-12 mb-20">
-          <div className="relative h-[600px] w-full border border-white/10 bg-card group overflow-hidden">
-            {/* Schematic Grid Overlay */}
-            <div className="absolute inset-0 z-20 pointer-events-none opacity-30" 
-                 style={{ 
-                    backgroundImage: 'linear-gradient(rgba(255,255,255,0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.1) 1px, transparent 1px)', 
-                    backgroundSize: '40px 40px' 
-                 }}>
-            </div>
-            
-            {/* Measurement Markers */}
+        <div className="grid md:grid-cols-2 gap-8 lg:gap-12 mb-16 lg:mb-20">
+          <div className="relative h-[320px] sm:h-[420px] md:h-[520px] lg:h-[600px] w-full border border-white/10 bg-card group overflow-hidden">
+            <div
+              className="absolute inset-0 z-20 pointer-events-none opacity-30"
+              style={{
+                backgroundImage:
+                  "linear-gradient(rgba(255,255,255,0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.1) 1px, transparent 1px)",
+                backgroundSize: "40px 40px",
+              }}
+            ></div>
+
             <div className="absolute top-4 left-0 w-full h-px bg-white/20 z-20 flex justify-between px-2 font-mono text-[10px] text-gray-500">
                 <span>0</span><span>50</span><span>100</span>
             </div>
@@ -57,14 +65,12 @@ export default async function ProductPage({ params }: { params: Promise<{ id: st
             </div>
 
             <div className="absolute inset-0 bg-primary/5 opacity-0 group-hover:opacity-100 transition-opacity z-10 pointer-events-none"></div>
-            
-            {/* Tech corners */}
+
             <div className="absolute top-0 left-0 w-16 h-16 border-t-2 border-l-2 border-primary z-20"></div>
             <div className="absolute bottom-0 right-0 w-16 h-16 border-b-2 border-r-2 border-primary z-20"></div>
             <div className="absolute top-0 right-0 w-4 h-4 border-t-2 border-r-2 border-white/20 z-20"></div>
             <div className="absolute bottom-0 left-0 w-4 h-4 border-b-2 border-l-2 border-white/20 z-20"></div>
 
-            {/* Scanning Line */}
             <div className="absolute top-0 left-0 w-full h-1 bg-primary/50 shadow-[0_0_15px_rgba(204,255,0,0.5)] animate-scan z-30 opacity-50"></div>
 
             {product.image ? (
@@ -72,10 +78,9 @@ export default async function ProductPage({ params }: { params: Promise<{ id: st
             ) : (
                 <div className="w-full h-full bg-gray-900 flex items-center justify-center font-bold text-xl text-gray-600">NO IMAGE</div>
             )}
-            
-            {/* Image Data Overlay */}
+
             <div className="absolute bottom-4 left-4 z-30 font-mono text-xs text-primary bg-black/80 px-2 py-1 border border-primary/30">
-                IMG_SRC: {product.id.substring(0,8).toUpperCase()} // RES: 4K
+              IMG_SRC: {product.id.substring(0,8).toUpperCase()} | RES: 4K
             </div>
           </div>
           <ProductDetails product={product} variants={variants} />
@@ -87,7 +92,7 @@ export default async function ProductPage({ params }: { params: Promise<{ id: st
                 <h2 className="text-4xl font-black uppercase tracking-tighter mb-8 text-white">
                     System <span className="text-primary">Recommendations</span>
                 </h2>
-                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 sm:gap-8">
                     {relatedProducts.map((related) => (
                         <ProductCard 
                             key={related.id} 

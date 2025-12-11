@@ -15,6 +15,8 @@
 @layer base {
   body {
     @apply bg-background text-text overflow-x-hidden;
+    font-size: clamp(14px, 1.6vw, 16px);
+    line-height: 1.6;
     /* background-image: 
       linear-gradient(rgba(20, 20, 20, 0.8) 1px, transparent 1px),
       linear-gradient(90deg, rgba(20, 20, 20, 0.8) 1px, transparent 1px);
@@ -23,6 +25,16 @@
   
   h1, h2, h3, h4, h5, h6 {
     @apply font-black uppercase tracking-tighter;
+    line-height: 1.1;
+  }
+}
+
+@layer utilities {
+  .section-pad {
+    @apply px-4 sm:px-6 lg:px-8;
+  }
+  .section-y {
+    @apply py-12 sm:py-16 lg:py-20;
   }
 }
 

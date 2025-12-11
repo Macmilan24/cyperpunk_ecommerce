@@ -6,8 +6,47 @@ import { motion } from "framer-motion";
 export function CustomCursor() {
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
   const [isHovering, setIsHovering] = useState(false);
+  const [isTouch, setIsTouch] = useState(false);
+  const [isSmall, setIsSmall] = useState(false);
 
+  // Detect touch/pen input only when it actually occurs, so desktops with touch screens keep the cursor until touched.
   useEffect(() => {
+    const markTouch = () => setIsTouch(true);
+    const markPointer = (e: PointerEvent) => {
+      if (e.pointerType === "touch" || e.pointerType === "pen") {
+        setIsTouch(true);
+      }
+    };
+
+    const win = typeof globalThis === "undefined" ? undefined : globalThis.window;
+    if (win) {
+      win.addEventListener("touchstart", markTouch, { once: true });
+      win.addEventListener("pointerdown", markPointer, { passive: true });
+    }
+
+    return () => {
+      if (win) {
+        win.removeEventListener("touchstart", markTouch);
+        win.removeEventListener("pointerdown", markPointer as any);
+      }
+    };
+  }, []);
+
+  // Disable on small viewports (mobile widths)
+  useEffect(() => {
+    const win = typeof globalThis === "undefined" ? undefined : globalThis.window;
+    if (!win) return;
+    const mq = win.matchMedia("(max-width: 767px)");
+    const sync = () => setIsSmall(mq.matches);
+    sync();
+    mq.addEventListener("change", sync);
+    return () => mq.removeEventListener("change", sync);
+  }, []);
+
+  // Only attach mouse listeners when not in touch mode.
+  useEffect(() => {
+    if (isTouch || isSmall) return;
+
     const updateMousePosition = (e: MouseEvent) => {
       setMousePosition({ x: e.clientX, y: e.clientY });
     };
@@ -27,14 +66,21 @@ export function CustomCursor() {
       }
     };
 
-    window.addEventListener("mousemove", updateMousePosition);
-    window.addEventListener("mouseover", handleMouseOver);
+    const win = typeof globalThis === "undefined" ? undefined : globalThis.window;
+    if (win) {
+      win.addEventListener("mousemove", updateMousePosition);
+      win.addEventListener("mouseover", handleMouseOver);
+    }
 
     return () => {
-      window.removeEventListener("mousemove", updateMousePosition);
-      window.removeEventListener("mouseover", handleMouseOver);
+      if (win) {
+        win.removeEventListener("mousemove", updateMousePosition);
+        win.removeEventListener("mouseover", handleMouseOver);
+      }
     };
-  }, []);
+  }, [isTouch, isSmall]);
+
+  if (isTouch || isSmall) return null;
 
   return (
     <>

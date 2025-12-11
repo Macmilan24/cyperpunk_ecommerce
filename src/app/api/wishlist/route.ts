@@ -23,18 +23,21 @@ export async function POST(req: Request) {
       );
     }
 
-    const existing = db
-      .prepare("SELECT * FROM wishlist WHERE userId = ? AND productId = ?")
-      .get(session.user.id, productId) as any;
+    const existingResult = await db.query(
+      'SELECT * FROM wishlist WHERE "userId" = $1 AND "productId" = $2',
+      [session.user.id, productId]
+    );
+    const existing = existingResult.rows[0];
 
     if (existing) {
-      db.prepare("DELETE FROM wishlist WHERE id = ?").run(existing.id);
+      await db.query("DELETE FROM wishlist WHERE id = $1", [existing.id]);
       return NextResponse.json({ status: "removed" });
     } else {
       const id = uuidv4();
-      db.prepare(
-        "INSERT INTO wishlist (id, userId, productId) VALUES (?, ?, ?)"
-      ).run(id, session.user.id, productId);
+      await db.query(
+        'INSERT INTO wishlist (id, "userId", "productId") VALUES ($1, $2, $3)',
+        [id, session.user.id, productId]
+      );
       return NextResponse.json({ status: "added" });
     }
   } catch (error: any) {

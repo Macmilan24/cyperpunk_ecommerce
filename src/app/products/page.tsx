@@ -10,15 +10,16 @@ export default async function ProductsPage() {
   let wishlistIds = new Set();
 
   try {
-      products = db.prepare('SELECT * FROM product').all();
+      const productsResult = await db.query('SELECT * FROM product');
+      products = productsResult.rows;
       
       const session = await auth.api.getSession({
         headers: await headers()
       });
 
       if (session) {
-        const wishlist = db.prepare('SELECT productId FROM wishlist WHERE userId = ?').all(session.user.id) as { productId: string }[];
-        wishlistIds = new Set(wishlist.map(w => w.productId));
+        const wishlistResult = await db.query('SELECT "productId" FROM wishlist WHERE "userId" = $1', [session.user.id]);
+        wishlistIds = new Set(wishlistResult.rows.map((w: any) => w.productId));
       }
 
   } catch (e) {

@@ -11,16 +11,39 @@ interface Product {
   description: string;
   price: number;
   image?: string;
+  stock?: number;
+  type?: 'physical' | 'digital'; // Added type
+}
+
+interface Variant {
+  id: string;
+  name: string;
+  size?: string; // Optional for digital
+  color?: string; // Optional for digital
+  options?: any; // Flexible options for digital (e.g. License)
   stock: number;
 }
 
-export function ProductDetails({ product }: { product: Product }) {
+export function ProductDetails({ product, variants = [] }: { product: Product; variants?: Variant[] }) {
   const [quantity, setQuantity] = useState(1);
+  const [selectedVariant, setSelectedVariant] = useState<Variant | null>(variants.length > 0 ? variants[0] : null);
   const [isTransferring, setIsTransferring] = useState(false);
   const addItem = useCartStore((state) => state.addItem);
 
+  // Group variants logic (Adaptive)
+  const isPhysical = product.type !== 'digital';
+  
+  // Only extract colors/sizes if physical
+  const colors = isPhysical ? Array.from(new Set(variants.map(v => v.color).filter(Boolean))) : [];
+  const sizes = isPhysical ? Array.from(new Set(variants.map(v => v.size).filter(Boolean))) : [];
+  
+  // For digital, we might have "License Types" instead
+  const licenses = !isPhysical ? variants : [];
+
+  const currentStock = selectedVariant ? selectedVariant.stock : (product.stock || 0);
+
   const increment = () => {
-    if (quantity < product.stock) {
+    if (quantity < currentStock) {
       setQuantity(quantity + 1);
     }
   };
@@ -32,9 +55,22 @@ export function ProductDetails({ product }: { product: Product }) {
   };
 
   const handleAddToCart = () => {
+    if (!selectedVariant && variants.length > 0) return;
+    
     setIsTransferring(true);
     setTimeout(() => {
-        addItem({ ...product, quantity });
+        addItem({ 
+            ...product, 
+            id: selectedVariant ? selectedVariant.id : product.id, // Use variant ID if available
+            productId: product.id,
+            name: selectedVariant ? `${product.name} (${selectedVariant.name})` : product.name,
+            quantity,
+            variant: selectedVariant ? {
+                id: selectedVariant.id,
+                size: selectedVariant.size,
+                color: selectedVariant.color
+            } : undefined
+        });
         setIsTransferring(false);
     }, 1500);
   };
@@ -49,23 +85,25 @@ export function ProductDetails({ product }: { product: Product }) {
         {product.name}
       </h1>
       
-      <div className="flex items-center mb-8 border-b border-white/10 pb-8">
-        <div className="flex flex-col">
-            <span className="text-xs font-mono text-gray-500 mb-1">PRICE_UNIT</span>
-            <span className="text-4xl font-black text-primary font-mono">
+      <div className="flex items-center mb-8 gap-4">
+        <div className="flex flex-col bg-white/5 border border-white/10 p-4 min-w-[140px] relative overflow-hidden group">
+            <div className="absolute top-0 left-0 w-1 h-full bg-primary/50"></div>
+            <span className="text-[10px] font-mono text-gray-500 mb-1 uppercase tracking-widest">Price_Unit</span>
+            <span className="text-3xl font-black text-white font-mono group-hover:text-primary transition-colors">
             ${Number(product.price).toFixed(2)}
             </span>
         </div>
         
-        <div className="ml-12 flex flex-col">
-            <span className="text-xs font-mono text-gray-500 mb-1">STOCK_STATUS</span>
-            {product.stock > 0 ? (
-            <span className="text-primary font-bold uppercase text-sm tracking-widest flex items-center gap-2">
+        <div className="flex flex-col bg-white/5 border border-white/10 p-4 min-w-[140px] relative overflow-hidden">
+            <div className="absolute top-0 right-0 w-1 h-full bg-white/20"></div>
+            <span className="text-[10px] font-mono text-gray-500 mb-1 uppercase tracking-widest">Stock_Status</span>
+            {currentStock > 0 ? (
+            <span className="text-primary font-bold uppercase text-sm tracking-widest flex items-center gap-2 mt-1">
                 <span className="w-2 h-2 bg-primary rounded-full animate-pulse"></span>
-                AVAILABLE [{product.stock}]
+                AVAILABLE [{currentStock}]
             </span>
             ) : (
-            <span className="text-red-500 font-bold uppercase text-sm tracking-widest flex items-center gap-2">
+            <span className="text-red-500 font-bold uppercase text-sm tracking-widest flex items-center gap-2 mt-1">
                 <span className="w-2 h-2 bg-red-500 rounded-full"></span>
                 UNAVAILABLE
             </span>
@@ -80,62 +118,129 @@ export function ProductDetails({ product }: { product: Product }) {
         </p>
       </div>
 
-      <div className="mb-10 relative overflow-hidden">
-        <h3 className="font-bold uppercase mb-4 text-white tracking-widest text-xs border-b border-white/10 pb-2 inline-block">
-            Technical_Specifications
-        </h3>
-        <div className="grid grid-cols-1 gap-2 font-mono text-xs text-gray-400">
-            <div className="flex justify-between border-b border-white/5 py-2">
-                <span>const MATERIAL</span>
-                <span className="text-white">"Synthetic_Polymer_V2"</span>
+      {/* Variant Selection */}
+      {variants.length > 0 && (
+        <div className="mb-8 space-y-6">
+            {/* Physical: Color Selection */}
+            {isPhysical && colors.length > 0 && (
+            <div>
+                <span className="text-xs font-bold uppercase tracking-widest text-gray-500 mb-3 block">Select_Color</span>
+                <div className="flex gap-3">
+                    {colors.map(color => (
+                        <button
+                            key={color as string}
+                            onClick={() => {
+                                const newVariant = variants.find(v => v.color === color && v.size === (selectedVariant?.size || sizes[0]));
+                                if (newVariant) setSelectedVariant(newVariant);
+                            }}
+                            className={`h-10 px-4 border font-mono text-xs uppercase transition-all ${
+                                selectedVariant?.color === color 
+                                ? 'border-primary bg-primary/10 text-primary' 
+                                : 'border-white/20 text-gray-400 hover:border-white/50'
+                            }`}
+                        >
+                            {color as string}
+                        </button>
+                    ))}
+                </div>
             </div>
-            <div className="flex justify-between border-b border-white/5 py-2">
-                <span>const DURABILITY</span>
-                <span className="text-white">"Grade_A_Military"</span>
-            </div>
-            <div className="flex justify-between border-b border-white/5 py-2">
-                <span>const STYLE</span>
-                <span className="text-white">"Neo_Brutalist"</span>
-            </div>
-            <div className="flex justify-between border-b border-white/5 py-2">
-                <span>const EDITION</span>
-                <span className="text-primary">"Limited_Drop"</span>
-            </div>
-        </div>
-      </div>
+            )}
 
-      <div className="flex flex-col sm:flex-row gap-6">
-        <div className="flex items-center border border-white/20 bg-black/50 h-14">
+            {/* Physical: Size Selection */}
+            {isPhysical && sizes.length > 0 && (
+            <div>
+                <span className="text-xs font-bold uppercase tracking-widest text-gray-500 mb-3 block">Select_Size</span>
+                <div className="flex gap-3">
+                    {sizes.map(size => {
+                        const variantForSize = variants.find(v => v.size === size && v.color === (selectedVariant?.color || colors[0]));
+                        const isAvailable = variantForSize && variantForSize.stock > 0;
+                        
+                        return (
+                            <button
+                                key={size as string}
+                                disabled={!isAvailable}
+                                onClick={() => {
+                                    if (variantForSize) setSelectedVariant(variantForSize);
+                                }}
+                                className={`w-12 h-12 border flex items-center justify-center font-mono text-xs font-bold transition-all ${
+                                    selectedVariant?.size === size
+                                    ? 'border-primary bg-primary text-black'
+                                    : isAvailable 
+                                        ? 'border-white/20 text-white hover:border-white' 
+                                        : 'border-white/5 text-white/20 cursor-not-allowed diagonal-strike'
+                                }`}
+                            >
+                                {size as string}
+                            </button>
+                        );
+                    })}
+                </div>
+            </div>
+            )}
+
+            {/* Digital: License Selection */}
+            {!isPhysical && (
+                <div>
+                    <span className="text-xs font-bold uppercase tracking-widest text-gray-500 mb-3 block">Select_License_Type</span>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        {licenses.map(license => (
+                            <button
+                                key={license.id}
+                                onClick={() => setSelectedVariant(license)}
+                                className={`p-4 border text-left transition-all ${
+                                    selectedVariant?.id === license.id
+                                    ? 'border-primary bg-primary/5'
+                                    : 'border-white/20 hover:border-white/50'
+                                }`}
+                            >
+                                <div className={`font-bold uppercase mb-1 ${selectedVariant?.id === license.id ? 'text-primary' : 'text-white'}`}>
+                                    {license.name}
+                                </div>
+                                <div className="text-xs font-mono text-gray-500">
+                                    {license.stock > 0 ? `AVAILABLE: ${license.stock}` : 'SOLD OUT'}
+                                </div>
+                            </button>
+                        ))}
+                    </div>
+                </div>
+            )}
+        </div>
+      )}
+
+      <div className="flex items-center gap-6 mb-8">
+        <div className="flex items-center border border-white/20 bg-black h-14">
             <button 
                 onClick={decrement}
-                disabled={quantity <= 1}
-                className="px-4 h-full hover:bg-white/10 hover:text-white text-gray-400 transition-colors disabled:opacity-50"
+                className="w-14 h-full flex items-center justify-center hover:bg-white/10 transition-colors text-white"
             >
                 <Minus className="w-4 h-4" />
             </button>
-            <div className="h-full w-16 flex items-center justify-center font-bold text-xl text-white font-mono border-x border-white/20">
+            <div className="w-16 text-center font-mono text-lg font-bold text-white border-x border-white/10 h-full flex items-center justify-center">
                 {quantity}
             </div>
             <button 
                 onClick={increment}
-                disabled={quantity >= product.stock}
-                className="px-4 h-full hover:bg-white/10 hover:text-white text-gray-400 transition-colors disabled:opacity-50"
+                className="w-14 h-full flex items-center justify-center hover:bg-white/10 transition-colors text-white"
             >
                 <Plus className="w-4 h-4" />
             </button>
         </div>
 
         <Button 
-            className="flex-1 h-14 neo-button text-lg relative overflow-hidden group" 
-            onClick={handleAddToCart}
-            disabled={product.stock === 0 || isTransferring}
+            onClick={handleAddToCart} 
+            disabled={currentStock === 0 || isTransferring}
+            className="neo-button h-14 px-8 flex-1 text-sm disabled:opacity-50 disabled:cursor-not-allowed relative overflow-hidden"
         >
-          <span className="relative z-10 flex items-center gap-2">
-            {isTransferring ? "TRANSFERRING DATA..." : "INITIATE TRANSFER"}
-          </span>
-          {isTransferring && (
-            <div className="absolute inset-0 bg-white/20 animate-progress origin-left"></div>
-          )}
+            {isTransferring ? (
+                <span className="flex items-center gap-2">
+                    <span className="w-2 h-2 bg-black rounded-full animate-ping"></span>
+                    {isPhysical ? "PROCESSING_ORDER..." : "ENCRYPTING_ASSET..."}
+                </span>
+            ) : currentStock === 0 ? (
+                "ALLOCATION_EXCEEDED"
+            ) : (
+                isPhysical ? "INITIATE_SHIPPING" : "INITIALIZE_DOWNLOAD"
+            )}
         </Button>
       </div>
     </div>

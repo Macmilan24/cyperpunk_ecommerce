@@ -28,6 +28,9 @@ export function ProductCard({ product, isInWishlist }: { product: Product; isInW
                 ) : (
                     <div className="w-full h-full bg-gray-900 flex items-center justify-center text-gray-600 font-bold">NO IMAGE</div>
                 )}
+                
+                {/* Holographic Overlay */}
+                <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none mix-blend-overlay holographic-bg z-10"></div>
             </Link>
             
             {/* Scanning Effect */}
@@ -50,7 +53,7 @@ export function ProductCard({ product, isInWishlist }: { product: Product; isInW
             </div>
         </div>
         <CardTitle className="truncate px-4 mt-2 text-lg">
-            <Link href={`/product/${product.id}`} className="text-white hover:text-primary transition-colors uppercase tracking-tight font-black">
+            <Link href={`/product/${product.id}`} className="text-white group-hover:text-primary transition-colors uppercase tracking-tight font-black group-hover:chromatic-aberration">
                 {product.name}
             </Link>
         </CardTitle>

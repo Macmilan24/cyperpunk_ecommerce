@@ -15,10 +15,10 @@
 @layer base {
   body {
     @apply bg-background text-text overflow-x-hidden;
-    background-image: 
+    /* background-image: 
       linear-gradient(rgba(20, 20, 20, 0.8) 1px, transparent 1px),
       linear-gradient(90deg, rgba(20, 20, 20, 0.8) 1px, transparent 1px);
-    background-size: 40px 40px;
+    background-size: 40px 40px; */
   }
   
   h1, h2, h3, h4, h5, h6 {
@@ -187,6 +187,55 @@
 
   .animate-progress {
     animation: progress 1.5s ease-out forwards;
+  }
+
+  /* Holographic Effect */
+  @keyframes hologram {
+    0% {
+      background-position: 0% 50%;
+      filter: hue-rotate(0deg);
+    }
+    50% {
+      background-position: 100% 50%;
+      filter: hue-rotate(15deg);
+    }
+    100% {
+      background-position: 0% 50%;
+      filter: hue-rotate(0deg);
+    }
+  }
+
+  .holographic-bg {
+    background: linear-gradient(
+      135deg,
+      rgba(204, 255, 0, 0.1) 0%,
+      rgba(0, 240, 255, 0.1) 50%,
+      rgba(255, 0, 60, 0.1) 100%
+    );
+    background-size: 200% 200%;
+    animation: hologram 3s ease infinite;
+  }
+
+  .chromatic-aberration {
+    animation: chromatic 2s infinite;
+  }
+
+  @keyframes chromatic {
+    0% {
+      text-shadow: 2px 0 #ff003c, -2px 0 #00f0ff;
+    }
+    25% {
+      text-shadow: -2px 0 #ff003c, 2px 0 #00f0ff;
+    }
+    50% {
+      text-shadow: 2px 0 #ff003c, -2px 0 #00f0ff;
+    }
+    75% {
+      text-shadow: -2px 0 #ff003c, 2px 0 #00f0ff;
+    }
+    100% {
+      text-shadow: 2px 0 #ff003c, -2px 0 #00f0ff;
+    }
   }
 
   /* Custom Scrollbar */

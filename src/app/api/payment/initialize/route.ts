@@ -21,27 +21,38 @@ export async function POST(req: Request) {
     const orderId = uuidv4();
 
     // Transaction for order creation
-    const createOrder = db.transaction(() => {
-      db.prepare(
-        'INSERT INTO "order" (id, userId, total, status) VALUES (?, ?, ?, ?)'
-      ).run(orderId, session.user.id, totalAmount, "PENDING");
+    const client = await db.connect();
+    try {
+      await client.query("BEGIN");
 
-      const insertItem = db.prepare(
-        "INSERT INTO order_item (id, orderId, productId, quantity, price) VALUES (?, ?, ?, ?, ?)"
+      await client.query(
+        'INSERT INTO "order" (id, "userId", total, status) VALUES ($1, $2, $3, $4)',
+        [orderId, session.user.id, totalAmount, "PENDING"]
       );
-      for (const item of cartItems) {
-        insertItem.run(uuidv4(), orderId, item.id, item.quantity, item.price);
-      }
-    });
 
-    createOrder();
+      for (const item of cartItems) {
+        const productId = item.productId || item.id;
+        const variantId = item.variant?.id || null;
+        await client.query(
+          'INSERT INTO order_item (id, "orderId", "productId", "variantId", quantity, price) VALUES ($1, $2, $3, $4, $5, $6)',
+          [uuidv4(), orderId, productId, variantId, item.quantity, item.price]
+        );
+      }
+
+      await client.query("COMMIT");
+    } catch (e) {
+      await client.query("ROLLBACK");
+      throw e;
+    } finally {
+      client.release();
+    }
 
     const tx_ref = `TX-${orderId}`;
 
-    db.prepare('UPDATE "order" SET paymentRef = ? WHERE id = ?').run(
+    await db.query('UPDATE "order" SET "paymentRef" = $1 WHERE id = $2', [
       tx_ref,
-      orderId
-    );
+      orderId,
+    ]);
 
     const chapaResponse = await initializePayment({
       amount: totalAmount.toString(),

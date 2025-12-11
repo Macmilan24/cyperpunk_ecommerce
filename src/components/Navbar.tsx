@@ -1,5 +1,6 @@
 "use client";
 
+import { SearchOverlay } from "./SearchOverlay";
 import Link from "next/link";
 import { useCartStore } from "@/lib/store";
 import { authClient } from "@/lib/auth-client";
@@ -13,29 +14,45 @@ export function Navbar() {
 
   return (
     <nav className="border-b border-white/5 p-0 sticky top-0 z-50 bg-black/80 backdrop-blur-xl">
+      {/* HUD Corner Brackets */}
+      <div className="absolute top-0 left-0 w-4 h-4 border-l-2 border-t-2 border-primary/50"></div>
+      <div className="absolute top-0 right-0 w-4 h-4 border-r-2 border-t-2 border-primary/50"></div>
+      <div className="absolute bottom-0 left-0 w-4 h-4 border-l-2 border-b-2 border-primary/50"></div>
+      <div className="absolute bottom-0 right-0 w-4 h-4 border-r-2 border-b-2 border-primary/50"></div>
+
       {/* Top Status Bar */}
-      <div className="bg-primary/5 border-b border-white/5 py-1 px-4 hidden lg:block">
-        <div className="container mx-auto flex justify-between items-center text-[10px] font-mono text-gray-500 uppercase tracking-widest">
-            <span>System Status: Online</span>
-            <span>Secure Connection: Encrypted</span>
-            <span>Region: Global</span>
+      <div className="bg-primary/5 border-b border-white/5 py-1 px-4 hidden lg:block relative overflow-hidden">
+        <div className="absolute top-0 left-0 w-full h-full bg-[url('/grid.png')] opacity-10"></div>
+        <div className="container mx-auto flex justify-between items-center text-[10px] font-mono text-gray-500 uppercase tracking-widest relative z-10">
+            <span className="flex items-center gap-2">
+                <span className="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse"></span>
+                System Status: Online
+            </span>
+            <span className="flex items-center gap-2">
+                <span className="w-1.5 h-1.5 bg-blue-500 rounded-full"></span>
+                Secure Connection: Encrypted
+            </span>
+            <span className="flex items-center gap-2">
+                <span className="w-1.5 h-1.5 bg-yellow-500 rounded-full"></span>
+                Region: Global
+            </span>
         </div>
       </div>
 
       <div className="container mx-auto flex justify-between items-center h-20 px-4 relative">
         <Link href="/" className="text-2xl font-black uppercase tracking-tighter text-white hover:text-primary transition-colors flex items-center gap-2 group">
           <div className="w-8 h-8 bg-primary text-black flex items-center justify-center font-mono text-xl font-bold group-hover:rotate-180 transition-transform duration-500">
-            F
+            N
           </div>
-          <span className="tracking-[0.2em]">FUTURE</span>
+          <span className="tracking-[0.2em]">NEXUS</span>
         </Link>
         
         <div className="hidden md:flex items-center gap-1 font-bold uppercase text-xs tracking-[0.2em]">
             {[
-              { name: "Electronics", href: "/category/electronics" },
-              { name: "Clothing", href: "/category/clothing" },
-              { name: "Accessories", href: "/category/accessories" },
-              { name: "Home", href: "/category/home-living" }
+              { name: "Digital", href: "/category/digital" },
+              { name: "Physical", href: "/category/physical" },
+              { name: "Art", href: "/category/art" },
+              { name: "Collectibles", href: "/category/collect" }
             ].map((link) => (
               <Link key={link.name} href={link.href} className="group relative px-6 py-2 text-gray-400 hover:text-white transition-colors overflow-hidden">
                  <span className="relative z-10 group-hover:text-primary transition-colors duration-300">
@@ -56,6 +73,7 @@ export function Navbar() {
           <div className="h-8 w-[1px] bg-white/10 hidden sm:block"></div>
 
           <div className="flex items-center gap-2">
+            <SearchOverlay />
             <Link href="/wishlist">
                 <Button variant="ghost" className="relative hover:bg-transparent text-gray-400 hover:text-accent transition-colors p-2 h-auto">
                 <Heart className="w-5 h-5" />

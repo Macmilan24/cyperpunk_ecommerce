@@ -2,12 +2,18 @@ import { create } from "zustand";
 import { persist } from "zustand/middleware";
 
 export interface CartItem {
-  id: string;
+  id: string; // This can be productId OR variantId
+  productId?: string; // The parent product ID
   name: string;
   price: number;
   quantity: number;
   image?: string;
   description?: string;
+  variant?: {
+    id?: string;
+    size: string;
+    color: string;
+  };
 }
 
 interface StoreState {

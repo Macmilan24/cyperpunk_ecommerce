@@ -14,14 +14,16 @@ export default async function WishlistPage() {
     redirect("/sign-in");
   }
 
-  const wishlistItems = db.prepare(`
-    SELECT w.*, p.name as productName, p.price as productPrice, p.image as productImage, p.description as productDescription 
+  const wishlistResult = await db.query(`
+    SELECT w.*, p.name as "productName", p.price as "productPrice", p.image as "productImage", p.description as "productDescription" 
     FROM wishlist w 
-    JOIN product p ON w.productId = p.id 
-    WHERE w.userId = ?
-  `).all(session.user.id) as any[];
+    JOIN product p ON w."productId" = p.id 
+    WHERE w."userId" = $1
+  `, [session.user.id]);
+  
+  const wishlistItems = wishlistResult.rows;
 
-  const formattedItems = wishlistItems.map(item => ({
+  const formattedItems = wishlistItems.map((item: any) => ({
     id: item.id,
     product: {
         id: item.productId,

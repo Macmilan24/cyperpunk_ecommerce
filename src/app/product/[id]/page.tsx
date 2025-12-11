@@ -8,16 +8,22 @@ import Link from "next/link";
 
 export default async function ProductPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
-  const product = db.prepare('SELECT * FROM product WHERE id = ?').get(id) as any;
+  const productResult = await db.query('SELECT * FROM product WHERE id = $1', [id]);
+  const product = productResult.rows[0];
 
   if (!product) {
     notFound();
   }
 
-  const category = db.prepare('SELECT * FROM category WHERE id = ?').get(product.categoryId) as any;
+  const categoryResult = await db.query('SELECT * FROM category WHERE id = $1', [product.categoryId]);
+  const category = categoryResult.rows[0];
+
+  const variantsResult = await db.query('SELECT * FROM product_variant WHERE "productId" = $1', [id]);
+  const variants = variantsResult.rows;
   
   // Fetch related products (same category, excluding current product)
-  const relatedProducts = db.prepare('SELECT * FROM product WHERE categoryId = ? AND id != ? LIMIT 4').all(product.categoryId, id) as any[];
+  const relatedResult = await db.query('SELECT * FROM product WHERE "categoryId" = $1 AND id != $2 LIMIT 4', [product.categoryId, id]);
+  const relatedProducts = relatedResult.rows;
 
   return (
     <main className="min-h-screen bg-background text-white">
@@ -76,7 +82,7 @@ export default async function ProductPage({ params }: { params: Promise<{ id: st
                 IMG_SRC: {product.id.substring(0,8).toUpperCase()} // RES: 4K
             </div>
           </div>
-          <ProductDetails product={{...product, price: Number(product.price)}} />
+          <ProductDetails product={{...product, price: Number(product.price)}} variants={variants} />
         </div>
 
         {/* Related Products */}

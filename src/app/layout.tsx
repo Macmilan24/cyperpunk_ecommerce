@@ -3,6 +3,9 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { Footer } from "@/components/Footer";
 import { NoiseOverlay } from "@/components/ui/NoiseOverlay";
+import { SmoothScroll } from "@/components/SmoothScroll";
+import { CustomCursor } from "@/components/ui/CustomCursor";
+import NeuralGrid from "@/components/ui/NeuralGrid";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -15,8 +18,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Neo-Brutalism Store",
-  description: "A bold e-commerce experience",
+  title: "SECTOR 7 // ADVANCED TACTICAL GEAR",
+  description: "High-performance techwear and urban tactical equipment.",
 };
 
 export default function RootLayout({
@@ -27,9 +30,12 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased flex flex-col min-h-screen`}
+        className={`${geistSans.variable} ${geistMono.variable} antialiased flex flex-col min-h-screen cursor-none`}
       >
+        <CustomCursor />
+        <SmoothScroll />
         <NoiseOverlay />
+        <NeuralGrid />
         {children}
         <Footer />
       </body>

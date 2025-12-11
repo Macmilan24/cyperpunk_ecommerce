@@ -6,6 +6,7 @@ import { headers } from "next/headers";
 import Link from "next/link";
 import { FadeIn, StaggerContainer, StaggerItem } from "@/components/MotionWrapper";
 import { GlitchText } from "@/components/ui/GlitchText";
+import { Hero3D } from "@/components/ui/Hero3D";
 
 export default async function Home() {
   let categories: any[] = [];
@@ -14,17 +15,22 @@ export default async function Home() {
   let wishlistIds = new Set();
 
   try {
-      categories = db.prepare('SELECT * FROM category').all();
-      featuredProducts = db.prepare('SELECT * FROM product ORDER BY RANDOM() LIMIT 4').all();
-      newArrivals = db.prepare('SELECT * FROM product ORDER BY createdAt DESC LIMIT 4').all();
+      const categoriesResult = await db.query('SELECT * FROM category');
+      categories = categoriesResult.rows;
+
+      const featuredResult = await db.query('SELECT * FROM product ORDER BY RANDOM() LIMIT 4');
+      featuredProducts = featuredResult.rows;
+
+      const newArrivalsResult = await db.query('SELECT * FROM product ORDER BY "createdAt" DESC LIMIT 4');
+      newArrivals = newArrivalsResult.rows;
       
       const session = await auth.api.getSession({
         headers: await headers()
       });
 
       if (session) {
-        const wishlist = db.prepare('SELECT productId FROM wishlist WHERE userId = ?').all(session.user.id) as { productId: string }[];
-        wishlistIds = new Set(wishlist.map(w => w.productId));
+        const wishlistResult = await db.query('SELECT "productId" FROM wishlist WHERE "userId" = $1', [session.user.id]);
+        wishlistIds = new Set(wishlistResult.rows.map((w: any) => w.productId));
       }
 
   } catch (e) {
@@ -54,9 +60,9 @@ export default async function Home() {
             </div>
             
             <div className="mb-12 relative">
-                <GlitchText text="FUTURE" size="2xl" className="block leading-[0.85] tracking-tighter" />
+                <GlitchText text="NEXUS" size="2xl" className="block leading-[0.85] tracking-tighter" />
                 <div className="text-6xl md:text-8xl font-black text-transparent bg-clip-text bg-gradient-to-r from-white via-gray-400 to-gray-600 tracking-tighter leading-[0.85]">
-                  COMMERCE
+                  MARKET
                 </div>
                 
                 {/* Decorative lines */}
@@ -64,17 +70,17 @@ export default async function Home() {
             </div>
 
             <p className="text-lg md:text-xl font-medium mb-16 max-w-lg text-gray-400 leading-relaxed">
-              Upgrade your lifestyle with high-performance gear. <br/>
-              <span className="text-white">Zero compromise. Maximum efficiency.</span>
+              Premium Digital Assets & Physical Collectibles. <br/>
+              <span className="text-white">Curated for the discerning netrunner.</span>
             </p>
             
             <div className="flex flex-wrap gap-8 items-center">
-                <Link href="#shop" className="neo-button text-sm px-10 py-5 group relative overflow-hidden tracking-[0.2em]">
-                    <span className="relative z-10 group-hover:text-black transition-colors">INITIALIZE_SHOP</span>
+                <Link href="/category/digital" className="neo-button text-sm px-10 py-5 group relative overflow-hidden tracking-[0.2em]">
+                    <span className="relative z-10 group-hover:text-black transition-colors">ENTER_MARKET</span>
                     <div className="absolute inset-0 bg-primary translate-y-full group-hover:translate-y-0 transition-transform duration-300 ease-out"></div>
                 </Link>
                 <Link href="/about" className="text-sm font-bold uppercase tracking-[0.2em] text-gray-500 hover:text-white transition-colors flex items-center gap-4 group">
-                    <span>[ READ_MANIFESTO ]</span>
+                    <span>[ READ_PROTOCOLS ]</span>
                 </Link>
             </div>
           </FadeIn>
@@ -83,17 +89,13 @@ export default async function Home() {
           <div className="hidden lg:block relative h-[600px] w-full perspective-1000">
              <div className="absolute inset-0 border border-white/5 bg-white/[0.02] backdrop-blur-sm transform rotate-6 hover:rotate-0 transition-all duration-700 ease-out origin-bottom-right"></div>
              <div className="absolute inset-0 border border-white/10 bg-black/80 transform -rotate-3 hover:rotate-0 transition-all duration-700 ease-out flex items-center justify-center group overflow-hidden">
+                <Hero3D />
                 
                 {/* Internal Grid */}
-                <div className="absolute inset-0 opacity-20" style={{ backgroundImage: 'linear-gradient(rgba(255,255,255,0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.1) 1px, transparent 1px)', backgroundSize: '20px 20px' }}></div>
+                <div className="absolute inset-0 opacity-20 pointer-events-none" style={{ backgroundImage: 'linear-gradient(rgba(255,255,255,0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.1) 1px, transparent 1px)', backgroundSize: '20px 20px' }}></div>
                 
-                <div className="text-center relative z-10 transform group-hover:scale-110 transition-transform duration-700">
-                    <div className="text-9xl font-black text-white/5 select-none">01</div>
-                    <div className="text-primary font-mono text-xs tracking-[0.5em] uppercase mt-4 border-t border-primary/30 pt-4">Collection_Alpha</div>
-                </div>
-
                 {/* Scanning Line */}
-                <div className="absolute top-0 left-0 w-full h-1 bg-primary/50 shadow-[0_0_15px_rgba(204,255,0,0.5)] animate-scan opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                <div className="absolute top-0 left-0 w-full h-1 bg-primary/50 shadow-[0_0_15px_rgba(204,255,0,0.5)] animate-scan opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"></div>
              </div>
           </div>
         </div>
@@ -142,10 +144,12 @@ export default async function Home() {
         <div className="mb-24">
           <div className="flex justify-between items-end mb-12 border-b border-white/10 pb-6">
             <div className="flex flex-col gap-2">
-                <div className="font-mono text-xs text-primary tracking-widest uppercase">System.Collections.Get("Featured")</div>
+                <div className="font-mono text-xs text-primary tracking-widest uppercase">
+                    System.Collections.Get("Featured")
+                </div>
                 <h2 className="text-5xl font-black uppercase tracking-tighter text-white flex items-center gap-4">
                     <span className="w-3 h-12 bg-primary block"></span>
-                    Featured <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-white">Drops</span>
+                    Featured Drops
                 </h2>
             </div>
             <Link href="/products" className="neo-button text-xs px-6 py-3 hidden md:block">View All Data</Link>
@@ -166,10 +170,12 @@ export default async function Home() {
         <div>
           <div className="flex justify-between items-end mb-12 border-b border-white/10 pb-6">
             <div className="flex flex-col gap-2">
-                <div className="font-mono text-xs text-primary tracking-widest uppercase">System.Collections.Get("New_Arrivals")</div>
+                <div className="font-mono text-xs text-primary tracking-widest uppercase">
+                    System.Collections.Get("New_Arrivals")
+                </div>
                 <h2 className="text-5xl font-black uppercase tracking-tighter text-white flex items-center gap-4">
                     <span className="w-3 h-12 bg-white block"></span>
-                    New <span className="text-transparent bg-clip-text bg-gradient-to-r from-white to-gray-500">Arrivals</span>
+                    New Arrivals
                 </h2>
             </div>
             <Link href="/products" className="neo-button text-xs px-6 py-3 hidden md:block">View All Data</Link>

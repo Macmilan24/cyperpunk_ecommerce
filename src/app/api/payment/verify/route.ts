@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { verifyPayment } from "@/lib/chapa";
-import db from "@/lib/db";
+import { query } from "@/lib/db";
 
 export async function GET(req: Request) {
   const { searchParams } = new URL(req.url);
@@ -14,14 +14,14 @@ export async function GET(req: Request) {
     const verification = await verifyPayment(tx_ref);
 
     if (verification.status === "success") {
-      const orderResult = await db.query(
+      const orderResult = await query(
         'SELECT * FROM "order" WHERE "paymentRef" = $1',
         [tx_ref]
       );
       const order = orderResult.rows[0];
 
       if (order && order.status === "PENDING") {
-        await db.query('UPDATE "order" SET status = $1 WHERE id = $2', [
+        await query('UPDATE "order" SET status = $1 WHERE id = $2', [
           "PAID",
           order.id,
         ]);

@@ -1,33 +1,32 @@
 import { Navbar } from "@/components/Navbar";
 import { ProductCard } from "@/components/ProductCard";
-import db from "@/lib/db";
 import { auth } from "@/lib/auth";
 import { headers } from "next/headers";
 import { notFound } from "next/navigation";
 import Link from "next/link";
+import { getCategoryBySlug } from "@/services/category.service";
+import { getProductsByCategory } from "@/services/product.service";
+import { getWishlistProductIds } from "@/services/wishlist.service";
 
 export default async function CategoryPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
   
-  const categoryResult = await db.query('SELECT * FROM category WHERE slug = $1', [slug]);
-  const category = categoryResult.rows[0];
+  const category = await getCategoryBySlug(slug);
 
   if (!category) {
     notFound();
   }
 
-  const productsResult = await db.query('SELECT * FROM product WHERE "categoryId" = $1', [category.id]);
-  const products = productsResult.rows;
+  const products = await getProductsByCategory(category.id);
 
-  let wishlistIds = new Set();
+  let wishlistIds = new Set<string>();
   try {
       const session = await auth.api.getSession({
         headers: await headers()
       });
 
       if (session) {
-        const wishlistResult = await db.query('SELECT "productId" FROM wishlist WHERE "userId" = $1', [session.user.id]);
-        wishlistIds = new Set(wishlistResult.rows.map((w: any) => w.productId));
+        wishlistIds = await getWishlistProductIds(session.user.id);
       }
   } catch (e) {
       console.error("Failed to fetch wishlist", e);
@@ -69,7 +68,7 @@ export default async function CategoryPage({ params }: { params: Promise<{ slug:
           {products.map((product) => (
             <ProductCard 
                 key={product.id} 
-                product={{...product, price: Number(product.price)}} 
+                product={product} 
                 isInWishlist={wishlistIds.has(product.id)}
             />
           ))}

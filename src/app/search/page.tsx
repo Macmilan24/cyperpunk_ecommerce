@@ -1,17 +1,12 @@
 import { Navbar } from "@/components/Navbar";
 import { ProductCard } from "@/components/ProductCard";
-import db from "@/lib/db";
 import Link from "next/link";
+import { searchProducts } from "@/services/search.service";
 
 export default async function SearchPage({ searchParams }: { searchParams: Promise<{ q: string }> }) {
   const { q } = await searchParams;
   
-  // Basic search implementation
-  const productsResult = await db.query(
-    `SELECT * FROM product WHERE name ILIKE $1 OR description ILIKE $2`,
-    [`%${q}%`, `%${q}%`]
-  );
-  const products = productsResult.rows;
+  const products = await searchProducts(q);
 
   return (
     <main className="min-h-screen bg-background text-white">
@@ -33,7 +28,7 @@ export default async function SearchPage({ searchParams }: { searchParams: Promi
           {products.map((product) => (
             <ProductCard 
                 key={product.id} 
-                product={{...product, price: Number(product.price)}} 
+                product={product} 
                 isInWishlist={false}
             />
           ))}

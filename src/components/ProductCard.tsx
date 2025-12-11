@@ -12,7 +12,7 @@ interface Product {
   name: string;
   description: string;
   price: number;
-  image?: string;
+  image?: string | null;
 }
 
 export function ProductCard({ product, isInWishlist }: { product: Product; isInWishlist?: boolean }) {

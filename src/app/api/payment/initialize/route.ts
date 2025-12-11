@@ -4,6 +4,7 @@ import db from "@/lib/db";
 import { auth } from "@/lib/auth";
 import { headers } from "next/headers";
 import { v4 as uuidv4 } from "uuid";
+import { CartItem } from "@/lib/store";
 
 export async function POST(req: Request) {
   try {
@@ -30,7 +31,7 @@ export async function POST(req: Request) {
         [orderId, session.user.id, totalAmount, "PENDING"]
       );
 
-      for (const item of cartItems) {
+      for (const item of cartItems as CartItem[]) {
         const productId = item.productId || item.id;
         const variantId = item.variant?.id || null;
         await client.query(

@@ -1,25 +1,25 @@
 import { Navbar } from "@/components/Navbar";
 import { ProductCard } from "@/components/ProductCard";
-import db from "@/lib/db";
 import { auth } from "@/lib/auth";
 import { headers } from "next/headers";
-import Link from "next/link";
+import { getProducts, Product } from "@/services/product.service";
+import { getWishlistProductIds } from "@/services/wishlist.service";
 
 export default async function ProductsPage() {
-  let products: any[] = [];
-  let wishlistIds = new Set();
+  let products: Product[] = [];
+  let wishlistIds = new Set<string>();
 
   try {
-      const productsResult = await db.query('SELECT * FROM product');
-      products = productsResult.rows;
+      // Fetch products using the service
+      products = await getProducts();
       
       const session = await auth.api.getSession({
         headers: await headers()
       });
 
       if (session) {
-        const wishlistResult = await db.query('SELECT "productId" FROM wishlist WHERE "userId" = $1', [session.user.id]);
-        wishlistIds = new Set(wishlistResult.rows.map((w: any) => w.productId));
+        // Fetch wishlist using the service
+        wishlistIds = await getWishlistProductIds(session.user.id);
       }
 
   } catch (e) {
@@ -50,7 +50,7 @@ export default async function ProductsPage() {
             {products.map((product) => (
                 <ProductCard 
                     key={product.id} 
-                    product={{...product, price: Number(product.price)}} 
+                    product={product} 
                     isInWishlist={wishlistIds.has(product.id)}
                 />
             ))}

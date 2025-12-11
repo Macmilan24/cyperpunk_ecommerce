@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import db from "@/lib/db";
+import { query } from "@/lib/db";
 import { auth } from "@/lib/auth";
 import { headers } from "next/headers";
 import { v4 as uuidv4 } from "uuid";
@@ -23,18 +23,18 @@ export async function POST(req: Request) {
       );
     }
 
-    const existingResult = await db.query(
+    const existingResult = await query(
       'SELECT * FROM wishlist WHERE "userId" = $1 AND "productId" = $2',
       [session.user.id, productId]
     );
     const existing = existingResult.rows[0];
 
     if (existing) {
-      await db.query("DELETE FROM wishlist WHERE id = $1", [existing.id]);
+      await query("DELETE FROM wishlist WHERE id = $1", [existing.id]);
       return NextResponse.json({ status: "removed" });
     } else {
       const id = uuidv4();
-      await db.query(
+      await query(
         'INSERT INTO wishlist (id, "userId", "productId") VALUES ($1, $2, $3)',
         [id, session.user.id, productId]
       );
@@ -55,12 +55,12 @@ export async function GET(req: Request) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const result = await db.query(
+    const result = await query(
       `
-      SELECT w.*, p.name as productName, p.price as productPrice, p.image as productImage, p.description as productDescription 
+      SELECT w.*, p.name as "productName", p.price as "productPrice", p.image as "productImage", p.description as "productDescription" 
       FROM wishlist w 
-      JOIN product p ON w.productId = p.id 
-      WHERE w.userId = $1
+      JOIN product p ON w."productId" = p.id 
+      WHERE w."userId" = $1
     `,
       [session.user.id]
     );

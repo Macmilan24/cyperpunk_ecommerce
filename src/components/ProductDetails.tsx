@@ -10,9 +10,9 @@ interface Product {
   name: string;
   description: string;
   price: number;
-  image?: string;
+  image?: string | null;
   stock?: number;
-  type?: 'physical' | 'digital'; // Added type
+  type?: string; // Relaxed from 'physical' | 'digital' to match DB
 }
 
 interface Variant {

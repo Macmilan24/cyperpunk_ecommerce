@@ -1,36 +1,32 @@
 import { Navbar } from "@/components/Navbar";
 import { ProductCard } from "@/components/ProductCard";
-import db from "@/lib/db";
 import { auth } from "@/lib/auth";
 import { headers } from "next/headers";
 import Link from "next/link";
 import { FadeIn, StaggerContainer, StaggerItem } from "@/components/MotionWrapper";
 import { GlitchText } from "@/components/ui/GlitchText";
 import { Hero3D } from "@/components/ui/Hero3D";
+import { getCategories, Category } from "@/services/category.service";
+import { getFeaturedProducts, getNewArrivals, Product } from "@/services/product.service";
+import { getWishlistProductIds } from "@/services/wishlist.service";
 
 export default async function Home() {
-  let categories: any[] = [];
-  let featuredProducts: any[] = [];
-  let newArrivals: any[] = [];
-  let wishlistIds = new Set();
+  let categories: Category[] = [];
+  let featuredProducts: Product[] = [];
+  let newArrivals: Product[] = [];
+  let wishlistIds = new Set<string>();
 
   try {
-      const categoriesResult = await db.query('SELECT * FROM category');
-      categories = categoriesResult.rows;
-
-      const featuredResult = await db.query('SELECT * FROM product ORDER BY RANDOM() LIMIT 4');
-      featuredProducts = featuredResult.rows;
-
-      const newArrivalsResult = await db.query('SELECT * FROM product ORDER BY "createdAt" DESC LIMIT 4');
-      newArrivals = newArrivalsResult.rows;
+      categories = await getCategories();
+      featuredProducts = await getFeaturedProducts();
+      newArrivals = await getNewArrivals();
       
       const session = await auth.api.getSession({
         headers: await headers()
       });
 
       if (session) {
-        const wishlistResult = await db.query('SELECT "productId" FROM wishlist WHERE "userId" = $1', [session.user.id]);
-        wishlistIds = new Set(wishlistResult.rows.map((w: any) => w.productId));
+        wishlistIds = await getWishlistProductIds(session.user.id);
       }
 
   } catch (e) {

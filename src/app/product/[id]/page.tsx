@@ -1,29 +1,25 @@
 import { Navbar } from "@/components/Navbar";
-import db from "@/lib/db";
 import Image from "next/image";
 import { notFound } from "next/navigation";
 import { ProductDetails } from "@/components/ProductDetails";
 import { ProductCard } from "@/components/ProductCard";
 import Link from "next/link";
+import { getProductById, getProductVariants, getRelatedProducts } from "@/services/product.service";
+import { getCategoryById } from "@/services/category.service";
 
 export default async function ProductPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
-  const productResult = await db.query('SELECT * FROM product WHERE id = $1', [id]);
-  const product = productResult.rows[0];
+  const product = await getProductById(id);
 
   if (!product) {
     notFound();
   }
 
-  const categoryResult = await db.query('SELECT * FROM category WHERE id = $1', [product.categoryId]);
-  const category = categoryResult.rows[0];
-
-  const variantsResult = await db.query('SELECT * FROM product_variant WHERE "productId" = $1', [id]);
-  const variants = variantsResult.rows;
+  const category = await getCategoryById(product.categoryId);
+  const variants = await getProductVariants(id);
   
   // Fetch related products (same category, excluding current product)
-  const relatedResult = await db.query('SELECT * FROM product WHERE "categoryId" = $1 AND id != $2 LIMIT 4', [product.categoryId, id]);
-  const relatedProducts = relatedResult.rows;
+  const relatedProducts = await getRelatedProducts(product.categoryId, id);
 
   return (
     <main className="min-h-screen bg-background text-white">
@@ -82,7 +78,7 @@ export default async function ProductPage({ params }: { params: Promise<{ id: st
                 IMG_SRC: {product.id.substring(0,8).toUpperCase()} // RES: 4K
             </div>
           </div>
-          <ProductDetails product={{...product, price: Number(product.price)}} variants={variants} />
+          <ProductDetails product={product} variants={variants} />
         </div>
 
         {/* Related Products */}
@@ -95,7 +91,7 @@ export default async function ProductPage({ params }: { params: Promise<{ id: st
                     {relatedProducts.map((related) => (
                         <ProductCard 
                             key={related.id} 
-                            product={{...related, price: Number(related.price)}} 
+                            product={related} 
                             isInWishlist={false} // Simplified for now
                         />
                     ))}

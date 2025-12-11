@@ -1,4 +1,4 @@
-# NEXUS MARKET
+# 🌌 NEXUS MARKET
 
 ### The Next-Generation Hybrid Commerce Platform
 

@@ -8,16 +8,19 @@ const connectionString = process.env.DATABASE_URL || process.env.POSTGRES_URL;
 if (!connectionString) {
   // In build time this might be missing, so we warn but don't crash immediately
   // unless a query is attempted.
-  if (process.env.NODE_ENV !== 'production') {
-     console.warn("DATABASE_URL or POSTGRES_URL is missing.");
+  if (process.env.NODE_ENV !== "production") {
+    console.warn("DATABASE_URL or POSTGRES_URL is missing.");
   }
 }
 
 const config = {
   connectionString,
-  ssl: (connectionString && (connectionString.includes("localhost") || connectionString.includes("127.0.0.1"))) 
-    ? false 
-    : { rejectUnauthorized: false }
+  ssl:
+    connectionString &&
+    (connectionString.includes("localhost") ||
+      connectionString.includes("127.0.0.1"))
+      ? false
+      : { rejectUnauthorized: false },
 };
 
 if (process.env.NODE_ENV === "production") {

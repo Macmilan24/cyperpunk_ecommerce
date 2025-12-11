@@ -28,8 +28,15 @@ async function migrate() {
   }
 
   // 2. Connect to the target database
+  const connectionString = process.env.DATABASE_URL || process.env.POSTGRES_URL;
   const pool = new Pool({
-    connectionString: process.env.DATABASE_URL,
+    connectionString,
+    ssl:
+      connectionString &&
+      (connectionString.includes("localhost") ||
+        connectionString.includes("127.0.0.1"))
+        ? false
+        : { rejectUnauthorized: false },
   });
 
   const client = await pool.connect();

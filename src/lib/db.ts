@@ -5,12 +5,12 @@ let pool: Pool;
 
 if (process.env.NODE_ENV === "production") {
   pool = new Pool({
-    connectionString: process.env.DATABASE_URL,
+    connectionString: process.env.DATABASE_URL || process.env.POSTGRES_URL,
   });
 } else {
   if (!(global as any).postgresPool) {
     (global as any).postgresPool = new Pool({
-      connectionString: process.env.DATABASE_URL,
+      connectionString: process.env.DATABASE_URL || process.env.POSTGRES_URL,
     });
   }
   pool = (global as any).postgresPool;

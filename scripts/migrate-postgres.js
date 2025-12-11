@@ -179,6 +179,18 @@ async function migrate() {
         description: "Verified NFTs and Digital Keys.",
       },
       {
+        id: "cat_digital",
+        name: "Digital Assets",
+        slug: "digital",
+        description: "Downloadable content and software.",
+      },
+      {
+        id: "cat_physical",
+        name: "Physical Gear",
+        slug: "physical",
+        description: "Apparel and hardware.",
+      },
+      {
         id: "cat_art",
         name: "Fine Art Prints",
         slug: "art-prints",
@@ -218,7 +230,7 @@ async function migrate() {
         name: "Genesis Cube #001",
         description:
           "The first iteration of the Genesis series. A perfectly rendered 4D hypercube containing the source code for the original protocol.",
-        price: 2.5, // ETH equivalent or high value
+        price: 2500.00,
         categoryId: "cat_nft",
         image:
           "https://images.unsplash.com/photo-1614726365723-49cfae988527?q=80&w=1000&auto=format&fit=crop",
@@ -240,7 +252,7 @@ async function migrate() {
         name: "Neon Samurai Glitch",
         description:
           "A corrupted memory file recovered from Sector 7. Displays a samurai silhouette against a dying sun.",
-        price: 0.8,
+        price: 800.00,
         categoryId: "cat_nft",
         image:
           "https://images.unsplash.com/photo-1558478551-1a378f63328e?q=80&w=1000&auto=format&fit=crop",
@@ -255,6 +267,27 @@ async function migrate() {
           Format: ".GIF",
           Size: "12MB",
           Chain: "Solana",
+        }),
+      },
+      {
+        id: uuid(),
+        name: "Cyber-Void Key",
+        description:
+          "Access key for the restricted Void server. Grants holder entry to exclusive digital events.",
+        price: 150.00,
+        categoryId: "cat_digital",
+        image:
+          "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=1000&auto=format&fit=crop",
+        type: "digital",
+        editionSize: 500,
+        features: JSON.stringify([
+          "Server Access",
+          "Discord Role",
+          "Airdrop Eligible",
+        ]),
+        specs: JSON.stringify({
+          Type: "Utility Token",
+          Validity: "Lifetime",
         }),
       },
       // PHYSICAL ART
@@ -303,7 +336,54 @@ async function migrate() {
           Power: "USB-C",
         }),
       },
+      // PHYSICAL FASHION
+      {
+        id: uuid(),
+        name: "Techwear Bomber V2",
+        description:
+          "Water-resistant tactical bomber jacket with integrated LED strips and multiple utility pockets.",
+        price: 220.00,
+        categoryId: "cat_physical",
+        image:
+          "https://images.unsplash.com/photo-1551488852-18074120b315?q=80&w=1000&auto=format&fit=crop",
+        type: "physical",
+        editionSize: 200,
+        features: JSON.stringify([
+          "Waterproof",
+          "RGB Lighting",
+          "Modular Pockets",
+        ]),
+        specs: JSON.stringify({
+          Material: "Gore-Tex",
+          Fit: "Oversized",
+          Power: "Powerbank (Not Included)",
+        }),
+      },
     ];
+
+    // Generate 50 "CryptoPunk-like" Mock NFTs
+    for (let i = 1; i <= 50; i++) {
+      products.push({
+        id: uuid(),
+        name: `CyberPunk #${i.toString().padStart(3, '0')}`,
+        description: `Generative identity token from the original 2077 collection. Features unique traits and rarity.`,
+        price: Math.floor(Math.random() * 500) + 50, // Random price 50-550
+        categoryId: "cat_nft",
+        image: `https://api.dicebear.com/9.x/pixel-art/svg?seed=${i}`, // Use DiceBear for consistent pixel art
+        type: "digital",
+        editionSize: 1,
+        features: JSON.stringify([
+          "Unique Trait Generation",
+          "Verified Ownership",
+          "DAO Access"
+        ]),
+        specs: JSON.stringify({
+          Format: ".SVG",
+          Chain: "Polygon",
+          Rarity: Math.random() > 0.9 ? "Legendary" : "Common"
+        })
+      });
+    }
 
     for (const p of products) {
       await client.query(

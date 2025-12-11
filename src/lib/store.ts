@@ -11,8 +11,9 @@ export interface CartItem {
   description?: string;
   variant?: {
     id?: string;
-    size: string;
-    color: string;
+    size?: string;
+    color?: string;
+    name?: string;
   };
 }
 

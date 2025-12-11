@@ -68,7 +68,8 @@ export function ProductDetails({ product, variants = [] }: { product: Product; v
             variant: selectedVariant ? {
                 id: selectedVariant.id,
                 size: selectedVariant.size,
-                color: selectedVariant.color
+                color: selectedVariant.color,
+                name: selectedVariant.name
             } : undefined
         });
         setIsTransferring(false);

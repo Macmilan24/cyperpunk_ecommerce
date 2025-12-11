@@ -230,7 +230,7 @@ async function migrate() {
         name: "Genesis Cube #001",
         description:
           "The first iteration of the Genesis series. A perfectly rendered 4D hypercube containing the source code for the original protocol.",
-        price: 2500.00,
+        price: 2500.0,
         categoryId: "cat_nft",
         image:
           "https://images.unsplash.com/photo-1614726365723-49cfae988527?q=80&w=1000&auto=format&fit=crop",
@@ -252,7 +252,7 @@ async function migrate() {
         name: "Neon Samurai Glitch",
         description:
           "A corrupted memory file recovered from Sector 7. Displays a samurai silhouette against a dying sun.",
-        price: 800.00,
+        price: 800.0,
         categoryId: "cat_nft",
         image:
           "https://images.unsplash.com/photo-1558478551-1a378f63328e?q=80&w=1000&auto=format&fit=crop",
@@ -274,7 +274,7 @@ async function migrate() {
         name: "Cyber-Void Key",
         description:
           "Access key for the restricted Void server. Grants holder entry to exclusive digital events.",
-        price: 150.00,
+        price: 150.0,
         categoryId: "cat_digital",
         image:
           "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=1000&auto=format&fit=crop",
@@ -342,7 +342,7 @@ async function migrate() {
         name: "Techwear Bomber V2",
         description:
           "Water-resistant tactical bomber jacket with integrated LED strips and multiple utility pockets.",
-        price: 220.00,
+        price: 220.0,
         categoryId: "cat_physical",
         image:
           "https://images.unsplash.com/photo-1551488852-18074120b315?q=80&w=1000&auto=format&fit=crop",
@@ -365,7 +365,7 @@ async function migrate() {
     for (let i = 1; i <= 50; i++) {
       products.push({
         id: uuid(),
-        name: `CyberPunk #${i.toString().padStart(3, '0')}`,
+        name: `CyberPunk #${i.toString().padStart(3, "0")}`,
         description: `Generative identity token from the original 2077 collection. Features unique traits and rarity.`,
         price: Math.floor(Math.random() * 500) + 50, // Random price 50-550
         categoryId: "cat_nft",
@@ -375,13 +375,13 @@ async function migrate() {
         features: JSON.stringify([
           "Unique Trait Generation",
           "Verified Ownership",
-          "DAO Access"
+          "DAO Access",
         ]),
         specs: JSON.stringify({
           Format: ".SVG",
           Chain: "Polygon",
-          Rarity: Math.random() > 0.9 ? "Legendary" : "Common"
-        })
+          Rarity: Math.random() > 0.9 ? "Legendary" : "Common",
+        }),
       });
     }
 
